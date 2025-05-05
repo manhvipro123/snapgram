@@ -28,6 +28,7 @@ const LeftSizebar = () => {
             height={36}
           />
         </Link>
+
         <Link to={`/profile/${user.id}`} className="flex gap-3 items-center">
           <img
             src={user.imageUrl || "/assets/images/profile-placeholder.svg"}
@@ -39,6 +40,7 @@ const LeftSizebar = () => {
             <p className="text-sm text-gray-500">@{user.username}</p>
           </div>
         </Link>
+
         <ul className="flex flex-col gap-5">
           {sidebarLinks.map((link: INavLink) => {
             const isActive = location.pathname === link.route;
@@ -71,7 +73,7 @@ const LeftSizebar = () => {
       <Button
         variant="ghost"
         onClick={() => signOut()}
-        className="flex gap-4 items-center justify-start hover:bg-transparent hover:text-white"
+        className="h-14 flex gap-4 items-center justify-start cursor-pointer"
       >
         <img src="/assets/icons/logout.svg" alt="logout" />
         <p className="text-sm lg:text-md">Logout</p>

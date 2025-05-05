@@ -4,7 +4,6 @@ import {
   CreatePost,
   EditPost,
   Home,
-  LikedPosts,
   PostDetails,
   Profile,
   Saved,
@@ -36,11 +35,11 @@ const App = () => {
           <Route path="/create-post" element={<CreatePost />}></Route>
           <Route path="/update-post/:id" element={<EditPost />}></Route>
           <Route path="/post/:id" element={<PostDetails />}></Route>
-          <Route path="/profile/:id" element={<Profile />}></Route>
+          <Route path="/profile/:id/*" element={<Profile />}></Route>
           <Route path="/update-profile/:id" element={<UpdateProfile />}></Route>
-          <Route path="/liked-posts" element={<LikedPosts />}></Route>
         </Route>
       </Routes>
+
       <Toaster />
     </main>
   );

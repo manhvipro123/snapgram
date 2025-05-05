@@ -48,7 +48,7 @@ const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
           </p>
         </>
       ) : (
-        <div className="flex-center flex-col p-7 h-80 lg:h-[612px]">
+        <div className="flex items-center justify-center flex-col p-7 h-80 lg:h-[612px]">
           <img
             src="/assets/icons/file-upload.svg"
             alt="file-upload"

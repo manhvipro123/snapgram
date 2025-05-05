@@ -1,6 +1,11 @@
 import Loader from "@/components/shared/Loader";
 import PostCard from "@/components/shared/PostCard";
-import { useGetRecentPosts } from "@/lib/react-query/queriesAndMutation";
+import UserCard from "@/components/shared/UserCard";
+import { useUserContext } from "@/context/AuthContext";
+import {
+  useGetRecentPosts,
+  useGetUsers,
+} from "@/lib/react-query/queriesAndMutation";
 import { Models } from "appwrite";
 
 const Home = () => {
@@ -9,8 +14,14 @@ const Home = () => {
     isPending: isPostLoading,
     isError: isErrorPosts,
   } = useGetRecentPosts();
+  const {
+    data: creators,
+    isLoading: isUserLoading,
+    isError: isErrorCreators,
+  } = useGetUsers(10);
+  const { user } = useUserContext();
 
-  if (isErrorPosts) {
+  if (isErrorPosts || isErrorCreators) {
     return (
       <div className="flex flex-1">
         <div className="home-container">
@@ -38,6 +49,25 @@ const Home = () => {
             </ul>
           )}
         </div>
+      </div>
+
+      <div className="hidden xl:flex flex-col w-72 2xl:w-465 px-6 py-10 gap-10  overflow-scroll custom-scrollbar">
+        <h3 className="text-[24px] font-bold leading-[140%] tracking-tighter text-light-1">
+          Top Creators
+        </h3>
+        {isUserLoading && !creators ? (
+          <Loader />
+        ) : (
+          <ul className="grid 2xl:grid-cols-2 gap-6">
+            {creators?.documents.map((creator) => {
+              return creator?.$id !== user.id ? (
+                <li key={creator?.$id}>
+                  <UserCard user={creator} />
+                </li>
+              ) : null;
+            })}
+          </ul>
+        )}
       </div>
     </div>
   );
