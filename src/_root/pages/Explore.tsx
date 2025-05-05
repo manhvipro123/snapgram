@@ -7,7 +7,7 @@ import {
   useGetPosts,
   useSearchPosts,
 } from "@/lib/react-query/queriesAndMutation";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 
 const Explore = () => {
@@ -87,7 +87,7 @@ const Explore = () => {
           <p className="text-light-4 mt-10 text-center w-full">End of posts</p>
         ) : (
           posts.pages.map((item, index) => (
-            <GridPostList key={`page-${index}`} posts={item?.documents} />
+            <GridPostList key={`page-${index}`} posts={item.documents} />
           ))
         )}
       </div>

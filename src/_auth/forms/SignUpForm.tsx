@@ -29,7 +29,7 @@ const SignupForm = () => {
   const { mutateAsync: createUserAccount, isPending: isCreatingAccount } =
     useCreateUserAccount();
 
-  const { mutateAsync: signInAccount, isPending: isSigningIn } =
+  const { mutateAsync: signInAccount, isPending: isSigningInUser } =
     useSignInAccount();
 
   // 1. Define your form.
@@ -45,28 +45,33 @@ const SignupForm = () => {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SignupValidation>) {
-    const newUser = await createUserAccount(values);
+    try {
+      const newUser = await createUserAccount(values);
 
-    if (!newUser) {
-      return toast("Sign up failed. Please try again.", {});
-    }
+      if (!newUser) {
+        return toast("Sign up failed. Please try again.", {});
+      }
 
-    const session = await signInAccount({
-      email: values.email,
-      password: values.password,
-    });
+      const session = await signInAccount({
+        email: values.email,
+        password: values.password,
+      });
 
-    if (!session) {
-      return toast("Sign up failed. Please try again.", {});
-    }
+      if (!session) {
+        return toast("Something went wrong. Please login your new account", {});
+      }
 
-    const isLoggedIn = await checkAuthUser();
+      const isLoggedIn = await checkAuthUser();
 
-    if (isLoggedIn) {
-      form.reset();
-      navigate("/");
-    } else {
-      toast("Sign up failed. Please try again.", {});
+      if (isLoggedIn) {
+        form.reset();
+        navigate("/");
+      } else {
+        toast("Login failed. Please try again.", {});
+        return;
+      }
+    } catch (error) {
+      console.error("Error signing up:", error);
     }
   }
 
@@ -141,7 +146,7 @@ const SignupForm = () => {
             )}
           />
           <Button type="submit">
-            {isCreatingAccount ? (
+            {isCreatingAccount || isSigningInUser || isUserLoading ? (
               <>
                 <div className="flex items-center justify-center gap-2">
                   <Loader />
@@ -152,7 +157,7 @@ const SignupForm = () => {
               "Sign up"
             )}
           </Button>
-          <p className="text-sm text-white text-center">
+          <p className="text-sm text-white text-center mt-2">
             Already have an account?
             <Link to="/sign-in" className="text-sm ml-1 text-slate-500">
               Log in

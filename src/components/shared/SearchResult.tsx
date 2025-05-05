@@ -1,10 +1,9 @@
-import { Models } from "appwrite";
 import GridPostList from "./GridPostList";
 import Loader from "./Loader";
 
 export type SearchResultProps = {
   isSearchFetching: boolean;
-  searchedPosts: Models.Document[]; // Updated type to Models.Document[]
+  searchedPosts: any; // Updated type to Models.Document[]
 };
 
 const SearchResults = ({

@@ -10,6 +10,19 @@ const Home = () => {
     isError: isErrorPosts,
   } = useGetRecentPosts();
 
+  if (isErrorPosts) {
+    return (
+      <div className="flex flex-1">
+        <div className="home-container">
+          <p className="body-medium text-light-1">Something bad happened</p>
+        </div>
+        <div className="home-creators">
+          <p className="body-medium text-light-1">Something bad happened</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-1">
       <div className="flex flex-col flex-1 items-center gap-10 overflow-scroll py-10 px-5 md:px-8 lg:p-14 custom-scrollbar">
