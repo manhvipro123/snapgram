@@ -13,6 +13,8 @@ const PostCard = ({ post }: PostCardProps) => {
 
   if (!post.creator) return;
 
+  const isCreator = user.id === post.creator.$id;
+
   return (
     <div className="bg-dark-2 rounded-3xl border border-dark-4 p-5 lg:p-7 w-full max-w-screen-sm">
       <div className="flex justify-between items-center">
@@ -46,7 +48,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
         <Link
           to={`/update-post/${post.$id}`}
-          className={`${user.id !== post.creator.$id} && "hidden"`}
+          className={`${!isCreator && "hidden"}`}
         >
           <img src="/assets/icons/edit.svg" alt="edit" width={20} height={20} />
         </Link>

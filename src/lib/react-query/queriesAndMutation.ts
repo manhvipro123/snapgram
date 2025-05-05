@@ -9,6 +9,7 @@ import {
   createUserAccount,
   deletePost,
   deleteSavedPost,
+  followUser,
   getCurrentUser,
   getInfinitePosts,
   getPostById,
@@ -20,6 +21,7 @@ import {
   searchPosts,
   signInAccount,
   signOutAccount,
+  unfollowUser,
   updatePost,
   updateUser,
 } from "../appwrite/api";
@@ -232,6 +234,44 @@ export const useUpdateUser = () => {
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, data?.$id],
+      });
+    },
+  });
+};
+
+export const useFollowUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      followedId,
+    }: {
+      userId: string;
+      followedId: string;
+    }) => followUser(userId, followedId),
+    onSuccess: () => {
+      console.log("Success");
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USERS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USERS, 10],
+      });
+    },
+  });
+};
+
+export const useUnfollowUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ relationRecordId }: { relationRecordId: string }) =>
+      unfollowUser(relationRecordId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
       });
     },
   });

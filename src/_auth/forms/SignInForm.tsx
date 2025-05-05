@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -20,10 +20,10 @@ import { useSignInAccount } from "@/lib/react-query/queriesAndMutation";
 import { useUserContext } from "@/context/AuthContext";
 
 const SigninForm = () => {
-  const navigate = useNavigate();
   const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
 
-  const { mutateAsync: signInAccount } = useSignInAccount();
+  const { mutateAsync: signInAccount, isPending: isUserSigning } =
+    useSignInAccount();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof SigninValidation>>({
@@ -49,8 +49,6 @@ const SigninForm = () => {
 
     if (isLoggedIn) {
       form.reset();
-
-      navigate("/");
     } else {
       toast("Sign in failed. Please try again.", {});
     }
@@ -98,18 +96,12 @@ const SigninForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit">
-            {isUserLoading ? (
-              <>
-                <div className="flex items-center justify-center gap-2">
-                  <Loader />
-                  Loading...
-                </div>
-              </>
-            ) : (
-              "Sign in"
-            )}
+          <Button type="submit" disabled={isUserSigning}>
+            {(isUserLoading || isUserSigning) ?? <Loader />} Log In
           </Button>
+
+          {}
+
           <p className="text-sm text-white text-center">
             Don't have an account?
             <Link to="/sign-up" className="text-sm ml-1 text-slate-500">

@@ -10,6 +10,8 @@ export const INITIAL_USER = {
   email: "",
   imageUrl: "",
   bio: "",
+  followings: [],
+  followers: [],
 };
 
 const INITIAL_STATE = {
@@ -43,15 +45,19 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           email: currentAccount.email,
           imageUrl: currentAccount.imageUrl,
           bio: currentAccount.bio,
+          followings: currentAccount.followings,
+          followers: currentAccount.followers,
         });
 
         setIsAuthenticated(true);
-
+        navigate("/");
         return true;
       }
+      navigate("/sign-in");
       return false;
     } catch (error) {
       console.log(error);
+      navigate("/sign-in");
       return false;
     } finally {
       setIsLoading(false);
@@ -59,14 +65,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (
-      localStorage.getItem("cookieFallback") === "[]" ||
-      localStorage.getItem("cookieFallback") === null
-    ) {
-      navigate("/sign-in");
-    } else {
-      navigate("/");
-    }
     checkAuthUser();
   }, []);
 

@@ -8,9 +8,10 @@ const AllUsers = () => {
   const { data: creators, isLoading, isError: isErrorCreators } = useGetUsers();
   const { user } = useUserContext();
 
+  console.log(creators);
+
   if (isErrorCreators) {
     toast("Something went wrong while fetching users", {});
-
     return;
   }
 
@@ -30,7 +31,7 @@ const AllUsers = () => {
                   key={creator?.$id}
                   className="flex-1 min-w-[200px] w-full  "
                 >
-                  <UserCard user={creator} />
+                  <UserCard data={creator} />
                 </li>
               ) : null;
             })}

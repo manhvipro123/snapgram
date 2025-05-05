@@ -8,11 +8,16 @@ import {
 } from "react-router-dom";
 
 import { LikedPosts } from "@/_root/pages";
-import { useUserContext } from "@/context/AuthContext";
-import { useGetUserById } from "@/lib/react-query/queriesAndMutation";
+import {
+  useFollowUser,
+  useGetCurrentUser,
+  useGetUserById,
+} from "@/lib/react-query/queriesAndMutation";
 import Loader from "@/components/shared/Loader";
 import { Button } from "@/components/ui/button";
 import GridPostList from "@/components/shared/GridPostList";
+import { Models } from "appwrite";
+import { toast } from "sonner";
 
 interface StabBlockProps {
   value: string | number;
@@ -32,10 +37,31 @@ const StatBlock = ({ value, label }: StabBlockProps) => (
 
 const Profile = () => {
   const { id } = useParams();
-  const { user } = useUserContext();
   const { pathname } = useLocation();
 
+  const { data: user } = useGetCurrentUser();
   const { data: currentUser } = useGetUserById(id || "");
+  const { mutateAsync: followUser, isPending: isFollowingUser } =
+    useFollowUser();
+
+  const handleFollow = async () => {
+    // Implement follow functionality here
+    console.log(`Followed user with ID: ${currentUser?.$id}`);
+    const response = await followUser({
+      userId: user?.$id || "",
+      followedId: currentUser?.$id || "",
+    });
+
+    if (response) {
+      toast.success("User followed successfully", {
+        description: "You are now following this user.",
+      });
+    } else {
+      toast.error("Failed to follow user", {
+        description: "Please try again later.",
+      });
+    }
+  };
 
   if (!currentUser)
     return (
@@ -43,6 +69,11 @@ const Profile = () => {
         <Loader />
       </div>
     );
+
+  //check is user is already following
+  const isFollowing = user?.followings.some(
+    (following: Models.Document) => following.followed.$id === currentUser?.$id
+  );
 
   return (
     <div className="flex flex-col items-center flex-1 gap-10 overflow-scroll py-10 px-5 md:p-14 custom-scrollbar">
@@ -67,8 +98,14 @@ const Profile = () => {
 
             <div className="flex gap-8 mt-10 items-center justify-center xl:justify-start flex-wrap z-20">
               <StatBlock value={currentUser.posts.length} label="Posts" />
-              <StatBlock value={20} label="Followers" />
-              <StatBlock value={20} label="Following" />
+              <StatBlock
+                value={currentUser.followers.length}
+                label="Followers"
+              />
+              <StatBlock
+                value={currentUser.followings.length}
+                label="Following"
+              />
             </div>
 
             <p className="text-[14px] font-medium leading-[140%] md:text-[18px] text-center xl:text-left mt-7 max-w-screen-sm">
@@ -77,11 +114,11 @@ const Profile = () => {
           </div>
 
           <div className="flex justify-center gap-4">
-            <div className={`${user.id !== currentUser.$id && "hidden"}`}>
+            <div className={`${user?.$id !== currentUser.$id && "hidden"}`}>
               <Link
                 to={`/update-profile/${currentUser.$id}`}
                 className={`h-12 bg-dark-4 px-5 text-light-1 flex items-center justify-center gap-2 rounded-lg ${
-                  user.id !== currentUser.$id && "hidden"
+                  user?.$id !== currentUser.$id && "hidden"
                 }`}
               >
                 <img
@@ -95,16 +132,40 @@ const Profile = () => {
                 </p>
               </Link>
             </div>
-            <div className={`${user.id === id && "hidden"}`}>
-              <Button type="button" className="px-8">
-                Follow
+            <div className={`${user?.$id === id && "hidden"}`}>
+              <Button
+                type="button"
+                size="sm"
+                className="flex gap-2 px-5 cursor-pointer"
+                onClick={handleFollow}
+                disabled={isFollowingUser}
+              >
+                {isFollowing ? (
+                  <>
+                    <img
+                      src="/assets/icons/check-mark.png"
+                      alt="followed"
+                      width={20}
+                      height={20}
+                    />
+                    <p className="text-[14px] font-medium leading-[140%]">
+                      Following
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-[14px] font-medium leading-[140%]">
+                      {isFollowingUser ? <Loader /> : "Follow"}
+                    </div>
+                  </>
+                )}
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {currentUser.$id === user.id && (
+      {currentUser.$id === user?.$id && (
         <div className="flex max-w-5xl w-full">
           <Link
             to={`/profile/${id}`}
@@ -142,7 +203,7 @@ const Profile = () => {
           index
           element={<GridPostList posts={currentUser.posts} showUser={false} />}
         />
-        {currentUser.$id === user.id && (
+        {currentUser.$id === user?.$id && (
           <Route path="/liked-posts" element={<LikedPosts />} />
         )}
       </Routes>

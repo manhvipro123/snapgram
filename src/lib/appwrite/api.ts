@@ -200,7 +200,7 @@ export async function likePost(postId: string, likesArray: string[]) {
 
 export async function savePost(postId: string, userId: string) {
   try {
-    const updatedPost = await databases.createDocument(
+    const savedPost = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.savesCollectionId,
       ID.unique(),
@@ -209,8 +209,8 @@ export async function savePost(postId: string, userId: string) {
         post: postId,
       }
     );
-    if (!updatedPost) throw Error;
-    return updatedPost;
+    if (!savedPost) throw Error;
+    return savedPost;
   } catch (error) {
     console.log(error);
   }
@@ -221,7 +221,7 @@ export async function deleteSavedPost(savedRecordId: string) {
     const statusCode = await databases.deleteDocument(
       appwriteConfig.databaseId,
       appwriteConfig.savesCollectionId,
-      savedRecordId // Use saveRecordId instead of ID.unique()
+      savedRecordId
     );
     if (!statusCode) throw Error;
     return { status: "ok" };
@@ -388,8 +388,6 @@ export async function getUserById(userId: string) {
 
     if (!user) throw Error;
 
-    console.log(user);
-
     return user;
   } catch (error) {
     console.log(error);
@@ -449,6 +447,68 @@ export async function updateUser(user: IUpdateUser) {
     }
 
     return updatedUser;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== FOLLOW USER
+export async function followUser(userId: string, followedId: string) {
+  try {
+    // const relation = await getRelationById(userId);
+    // if (relation) {
+    //   const updatedRelation = await databases.updateDocument(
+    //     appwriteConfig.databaseId,
+    //     appwriteConfig.relationCollectionId,
+    //     userId,
+    //     {
+    //       followed: [...relation.followed, followedId],
+    //       follower: [userId],
+    //     }
+    //   );
+    //   if (!updatedRelation) throw Error;
+    //   return updatedRelation;
+    // }
+
+    const createdRelation = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.relationCollectionId,
+      ID.unique(),
+      {
+        followed: followedId,
+        follower: userId,
+      }
+    );
+    if (!createdRelation) throw Error;
+    return createdRelation;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getRelationById(userId: string) {
+  try {
+    const relation = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.relationCollectionId,
+      userId
+    );
+
+    return relation;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== UNFOLLOW USER
+export async function unfollowUser(relationRecordId: string) {
+  try {
+    await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.relationCollectionId,
+      relationRecordId
+    );
+    return { status: "ok" };
   } catch (error) {
     console.log(error);
   }
