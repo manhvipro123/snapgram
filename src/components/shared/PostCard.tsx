@@ -1,19 +1,19 @@
-import { useUserContext } from "@/context/AuthContext";
 import { multiFormatDateString } from "@/lib/utils";
 import { Models } from "appwrite";
 import { Link } from "react-router-dom";
 import PostStats from "./PostStats";
+import { useGetCurrentUser } from "@/lib/react-query/queriesAndMutation";
 
 type PostCardProps = {
   post: Models.Document;
 };
 
 const PostCard = ({ post }: PostCardProps) => {
-  const { user } = useUserContext();
+  const { data: user } = useGetCurrentUser();
 
   if (!post.creator) return;
 
-  const isCreator = user.id === post.creator.$id;
+  const isCreator = user?.$id === post.creator.$id;
 
   return (
     <div className="bg-dark-2 rounded-3xl border border-dark-4 p-5 lg:p-7 w-full max-w-screen-sm">
@@ -75,7 +75,7 @@ const PostCard = ({ post }: PostCardProps) => {
         />
       </Link>
 
-      <PostStats post={post} userId={user.id} />
+      <PostStats post={post} userId={user?.$id || ""} />
     </div>
   );
 };
